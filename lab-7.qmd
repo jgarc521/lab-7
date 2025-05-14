@@ -5,6 +5,8 @@ format: html
 editor: visual
 ---
 
+
+# Set up 
 ```{r}
 #| label: packages
 
@@ -16,8 +18,26 @@ library(purrr)
 library(tidyjson)
 ```
 
-## Problem 1
 
+# Question 1
 ```{r}
 #read_json('https://api.g7vrd.co.uk/v1/satellite-passes/25544/51.45/-2.5833.json?minelevation=70&hours=12')
 ```
+
+
+# Question 2 US State Capitols 
+```{r}
+
+
+
+```
+
+
+
+# Question 3 
+```{r}
+
+
+
+```
+>>>>>>> f8c1a0ca181e3e448b6bb284e39cfb771fedbcec
