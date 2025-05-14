@@ -16,12 +16,36 @@ library(jsonlite)
 library(dplyr)
 library(purrr)
 library(tidyjson)
+library(httr)
+
 ```
 
 # Question 1
 
 ```{r}
-#read_json('https://api.g7vrd.co.uk/v1/satellite-passes/25544/51.45/-2.5833.json?minelevation=70&hours=12')
+
+
+states = GET("https://people.sc.fsu.edu/~jburkardt/datasets/states/state_capitals_ll.txt")
+
+class(states)
+
+
+test = states$content %>% 
+  rawToChar() %>% str_split("\n", simplify = FALSE) #%>% separate_wider_delim(delim = " ")
+
+class(test)
+
+testdf = as.data.frame(test, ncol = 54)
+
+
+testdf %>% str_split_delim(delim = " ")
+
+
+satelite = GET('https://api.g7vrd.co.uk/v1/satellite-passes/25544/51.45/-2.5833.json?minelevation=30&hours=72')
+
+satelite$content %>% 
+  rawToChar() %>% 
+  fromJSON()
 ```
 
 # Question 2 US State Capitols
