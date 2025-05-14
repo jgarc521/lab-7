@@ -9,5 +9,15 @@ editor: visual
 #| label: packages
 
 library(tidyverse)
+library(repurrrsive)
+library(jsonlite)
+library(dplyr)
+library(purrr)
+library(tidyjson)
 ```
 
+## Problem 1
+
+```{r}
+#read_json('https://api.g7vrd.co.uk/v1/satellite-passes/25544/51.45/-2.5833.json?minelevation=70&hours=12')
+```
