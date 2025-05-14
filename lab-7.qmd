@@ -5,9 +5,34 @@ format: html
 editor: visual
 ---
 
+
+# Set up 
 ```{r}
 #| label: packages
 
 library(tidyverse)
 ```
 
+# Question 1
+```{r}
+
+
+
+```
+
+
+# Question 2 US State Capitols 
+```{r}
+
+
+
+```
+
+
+
+# Question 3 
+```{r}
+
+
+
+```
