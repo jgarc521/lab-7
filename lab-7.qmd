@@ -16,6 +16,7 @@ library(jsonlite)
 library(dplyr)
 library(purrr)
 library(tidyjson)
+library(leaflet)
 ```
 
 # Question 1
@@ -27,9 +28,19 @@ library(tidyjson)
 # Question 2 US State Capitols
 
 ```{r}
+capitals <- read.table("state_capitals_ll.txt")
+names <- read.table("state_capitals_name.txt")
 
+capital_data <- full_join(capitals, names, by = "V1") |>
+  rename(lat = V2.x, 
+         lng = V3)
 
+# US capitals map 
 
+leaflet() |>
+  addTiles() |>
+  setView(lng = -98.5795, lat = 39.8283, zoom = 3) |>
+  addMarkers(data = capital_data)
 ```
 
 # Question 3
