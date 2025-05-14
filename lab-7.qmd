@@ -4,3 +4,10 @@ author: "Sydney, Lucas, Jose"
 format: html
 editor: visual
 ---
+
+```{r}
+#| label: packages
+
+library(tidyverse)
+```
+
