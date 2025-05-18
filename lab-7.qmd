@@ -16,6 +16,8 @@ library(jsonlite)
 library(dplyr)
 library(purrr)
 library(tidyjson)
+library(httr)
+
 
 ```
 
@@ -34,11 +36,15 @@ test = states$content %>%
 
 class(test)
 
-testdf = as.data.frame(test, ncol = 54)
+length(test[[1]])
+
+testdf = as.data.frame(test, ncol = length(test[[1]]))
 
 
-testdf %>% str_split_delim(delim = " ")
+testdf %>% str_split(delim = " ")
+```
 
+```{r}
 
 satelite = GET('https://api.g7vrd.co.uk/v1/satellite-passes/25544/51.45/-2.5833.json?minelevation=30&hours=72')
 
