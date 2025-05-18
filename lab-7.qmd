@@ -9,6 +9,7 @@ editor: visual
 
 ```{r}
 #| label: packages
+#| message: false
 
 library(tidyverse)
 library(repurrrsive)
@@ -16,61 +17,97 @@ library(jsonlite)
 library(dplyr)
 library(purrr)
 library(tidyjson)
-
+library(httr)
+library(glue)
+library(leaflet)
 ```
 
 # Question 1
 
 ```{r}
+# read in capital lat and long
+capitals <- read.table("https://people.sc.fsu.edu/~jburkardt/datasets/states/state_capitals_ll.txt", col.names = c("State", "Lat", "Long"))
 
+# read in capital names
+capital_names <- read.table("https://people.sc.fsu.edu/~jburkardt/datasets/states/state_capitals_name.txt", col.names = c("State", "Capital"))
 
-states = GET("https://people.sc.fsu.edu/~jburkardt/datasets/states/state_capitals_ll.txt")
+# merge df's
+capitals <- capitals |>
+  left_join(capital_names, by = "State")
 
-class(states)
+# function for getting pass times
+pass_times <- function(capitals_df) {
+  
+  get_passes <- function(state, capital, lat, lon) {
+    res <- GET(
+      glue("https://api.g7vrd.co.uk/v1/satellite-passes/25544/{lat}/{lon}.json"),
+      query = list(hours = 72, minelevation = 70)
+    )
+    
+    data <- fromJSON(rawToChar(res$content))
+    
+    # get first 3 pass times
+    passes <- data$passes %>%
+      head(3)
+    
+    # create tibble 
+    tibble(
+      State = state,
+      Capital = capital,
+      Latitude = lat,
+      Longitude = lon,
+      PassTime = ymd_hms(str_remove(as.character(passes$start), "Z"))
+    )
+  }
+  
+  # apply function to capitals df
+  result <- pmap_dfr(
+    list(capitals_df$State, capitals_df$Capital, capitals_df$Lat, capitals_df$Long),
+    get_passes
+  )
+  
+  return(result)
+}
 
+# create df
+ISS_data <- pass_times(capitals)
 
-test = states$content %>% 
-  rawToChar() %>% str_split("\n", simplify = FALSE) #%>% separate_wider_delim(delim = " ")
-
-class(test)
-
-testdf = as.data.frame(test, ncol = 54)
-
-
-testdf %>% str_split_delim(delim = " ")
-
-
-satelite = GET('https://api.g7vrd.co.uk/v1/satellite-passes/25544/51.45/-2.5833.json?minelevation=30&hours=72')
-
-satelite$content %>% 
-  rawToChar() %>% 
-  fromJSON()
+# reorder df
+ISS_data <- ISS_data |>
+  arrange(State, PassTime)
 ```
 
 # Question 2 US State Capitols
 
 ```{r}
-capitals <- read.table("state_capitals_ll.txt")
-names <- read.table("state_capitals_name.txt")
-
-capital_data <- full_join(capitals, names, by = "V1") |>
-  rename(lat = V2.x, 
-         lng = V3)
-
-# US capitals map 
-
-leaflet() |>
+leaflet(data = capitals) |>
   addTiles() |>
   setView(lng = -98.5795, lat = 39.8283, zoom = 3) |>
-  addMarkers(data = capital_data)
+  addMarkers(
+    lng = ~Long,
+    lat = ~Lat,
+    popup = ~paste0(Capital, ", ", State)
+  )
 ```
 
 # Question 3
 
 ```{r}
+icon <- makeIcon(
+  iconUrl = "https://cdn1.iconfinder.com/data/icons/space-butterscotch-vol-2/256/Orbital_Station-1024.png",
+  iconWidth = 20,
+  iconHeight = 20
+)
 
-
-
+leaflet(data = capitals) |>
+  addTiles() |>
+  setView(lng = -98.5795, lat = 39.8283, zoom = 3) |>
+  addMarkers(
+    lng = ~Long,
+    lat = ~Lat,
+    popup = ~paste0(Capital, ", ", State),
+    icon = icon
+  )
 ```
 
 # Question 4
