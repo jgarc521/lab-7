@@ -99,6 +99,13 @@ leaflet(data = capitals) |>
 # Question 3 Icon
 
 ```{r}
+icon <- makeIcon(
+  iconUrl = "https://cdn1.iconfinder.com/data/icons/space-butterscotch-vol-2/256/Orbital_Station-1024.png",
+  iconWidth = 20,
+  iconHeight = 20
+)
+
+
 leaflet(data = capitals) |>
   addTiles() |>
   setView(lng = -98.5795, lat = 39.8283, zoom = 3) |>
@@ -144,5 +151,25 @@ leaflet(data = ISS_data) |>
 # Question 5
 
 ```{r}
+
+east_west <- ISS_data |>
+  arrange(Pass1)
+
+leaflet(data = ISS_data) |>
+  addTiles() |>
+  setView(lng = -98.5795, lat = 39.8283, zoom = 3) |>
+  addMarkers(
+    lng = ~Longitude,
+    lat = ~Latitude,
+    label = ~labels,
+    popup = ~popups,
+    icon = icon
+  ) |>
+  addPolylines(data = east_west, lat = ~Latitude,
+               lng = ~Longitude,
+               color = "red",
+               weight = 2)
+
+
 
 ```
