@@ -20,6 +20,7 @@ library(tidyjson)
 library(httr)
 library(glue)
 library(leaflet)
+library(htmltools)
 ```
 
 # Question 1
@@ -35,13 +36,14 @@ capital_names <- read.table("https://people.sc.fsu.edu/~jburkardt/datasets/state
 capitals <- capitals |>
   left_join(capital_names, by = "State")
 
+
 # function for getting pass times
 pass_times <- function(capitals_df) {
   
   get_passes <- function(state, capital, lat, lon) {
     res <- GET(
       glue("https://api.g7vrd.co.uk/v1/satellite-passes/25544/{lat}/{lon}.json"),
-      query = list(hours = 72, minelevation = 70)
+      query = list(hours = 72, minelevation = 30)
     )
     
     data <- fromJSON(rawToChar(res$content))
@@ -56,7 +58,8 @@ pass_times <- function(capitals_df) {
       Capital = capital,
       Latitude = lat,
       Longitude = lon,
-      PassTime = ymd_hms(str_remove(as.character(passes$start), "Z"))
+      PassTime = ymd_hms(str_remove(as.character(passes$start), "Z")),
+      PassNumber = seq.int(nrow(passes))
     )
   }
   
@@ -75,6 +78,9 @@ ISS_data <- pass_times(capitals)
 # reorder df
 ISS_data <- ISS_data |>
   arrange(State, PassTime)
+
+#pivoting on pass times to create one row per capital
+ISS_data = ISS_data |> pivot_wider(names_from = PassNumber, values_from = PassTime, names_prefix = "Pass")
 ```
 
 # Question 2 US State Capitols
@@ -114,7 +120,32 @@ leaflet(data = capitals) |>
 
 ```{r}
 
+#formatting popups and labels as HTML for line breaks
+popups <- paste0(ISS_data$State, ", ", ISS_data$Capital, "<br>",
+                "Next 3 Passes: <br>",
+                ISS_data$Pass1, " UTC", "<br>",
+                   ISS_data$Pass2, " UTC",  "<br>",
+                   ISS_data$Pass3, " UTC") |>
+  lapply(htmltools::HTML)
+
+labels <- paste0(ISS_data$State, ", ", ISS_data$Capital, "<br>",
+                "Next Pass: <br>",
+                ISS_data$Pass1, " UTC") |>
+  lapply(htmltools::HTML)
+
+leaflet(data = ISS_data) |>
+  addTiles() |>
+  setView(lng = -98.5795, lat = 39.8283, zoom = 3) |>
+  addMarkers(
+    lng = ~Longitude,
+    lat = ~Latitude,
+    label = ~labels,
+    popup = ~popups,
+    icon = icon
+  ) 
+
 ```
+
 
 # Question 5
 
