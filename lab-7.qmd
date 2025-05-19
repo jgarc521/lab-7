@@ -96,15 +96,9 @@ leaflet(data = capitals) |>
   )
 ```
 
-# Question 3
+# Question 3 Icon
 
 ```{r}
-icon <- makeIcon(
-  iconUrl = "https://cdn1.iconfinder.com/data/icons/space-butterscotch-vol-2/256/Orbital_Station-1024.png",
-  iconWidth = 20,
-  iconHeight = 20
-)
-
 leaflet(data = capitals) |>
   addTiles() |>
   setView(lng = -98.5795, lat = 39.8283, zoom = 3) |>
