@@ -23,6 +23,7 @@ library(leaflet)
 
 ```{r}
 #read_json('https://api.g7vrd.co.uk/v1/satellite-passes/25544/51.45/-2.5833.json?minelevation=70&hours=12')
+
 ```
 
 # Question 2 US State Capitols
@@ -36,17 +37,18 @@ capital_data <- full_join(capitals, names, by = "V1") |>
          lng = V3)
 
 # US capitals map 
-
 leaflet() |>
   addTiles() |>
-  setView(lng = -98.5795, lat = 39.8283, zoom = 3) |>
-  addMarkers(data = capital_data)
+  setView(lng = -98.5795,
+          lat = 39.8283,
+          zoom = 3) |>
+  addMarkers(data = capital_data, 
+             popup = capital_data$V2.y)
 ```
 
-# Question 3
+# Question 3 Icon
 
 ```{r}
-
 
 
 ```
